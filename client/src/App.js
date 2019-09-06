@@ -4,10 +4,11 @@ import './App.css';
 
 function App() {
   const [bounties, setBounties] = useState([{
-    title: 'loading',
+    title: 'Loading...',
     token_symbol: '',
-    calculated_fulfillment_amount: '-',
-    description: ''
+    calculated_fulfillment_amount: '0',
+    description: '',
+    attached_url: '#'
   }])
   const getApi = async () => {
     // this example shows all active bounties 
@@ -16,23 +17,22 @@ function App() {
     // for only one platform, here gitcoin
     // only showing open bounties
     // with pay greater than 0
-    let res = await fetch(`https://api.bounties.network/bounty/?ordering=-usd_price&platform=gitcoin&bountyStage=1`)
+    let res = await fetch(`https://api.bounties.network/bounty/?ordering=usd_price&issuer=0x4be5f7c9912afd58bcda39b0a4ec76e7b21ba0f1&bountyStage=1`)
     let json = await res.json();
     setBounties(json.results);
   }
 
   const createCard = () => {
-    bounties.map((bounty) => {
-      console.log(bounty)
-      return (
-        <div> 
-          <h2>Bounty Title</h2>
+    return bounties.map((bounty) => (
+      
+        <div>
+        <h2><a href={bounty.attached_url}>{bounty.title} [{parseFloat(bounty.calculated_fulfillment_amount).toFixed(2)} {bounty.token_symbol}]</a></h2>
           <p>
-            Bounty description
+            {bounty.description}
           </p>
         </div>
-      )
-    })
+      
+    ))
   }
 
   useEffect(() => {
