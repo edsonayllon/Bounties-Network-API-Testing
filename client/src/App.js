@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
+import ReactMarkdown from 'react-markdown';
 
 function App() {
   const [bounties, setBounties] = useState([{
@@ -38,9 +39,7 @@ function App() {
     return bounties.map((bounty) =>  (
       <div key={bounty.id}>
         <h2><a href={bounty.attached_url}>{bounty.title} [{parseFloat(bounty.calculated_fulfillment_amount).toFixed(2)} {bounty.token_symbol}]</a></h2>
-        <p>
-          {bounty.description}
-        </p>
+        <ReactMarkdown source={bounty.description} />
       </div>
     ))
   }
