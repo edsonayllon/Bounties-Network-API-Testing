@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
@@ -8,38 +7,50 @@ function App() {
     token_symbol: '',
     calculated_fulfillment_amount: '0',
     description: '',
-    attached_url: '#'
+    attached_url: '#',
+    id: 1
   }])
+  const [page, setPage] = useState(0);
+  const [totalResults, setTotalResults] = useState(0);
+
   const getApi = async () => {
     // this example shows all active bounties 
-    // for the gitcoin platform
+    // for one issuer
     // sorted by reward in USD
-    // for only one platform, here gitcoin
     // only showing open bounties
-    // with pay greater than 0
-    let res = await fetch(`https://api.bounties.network/bounty/?ordering=usd_price&issuer=0x4be5f7c9912afd58bcda39b0a4ec76e7b21ba0f1&bountyStage=1`)
+    // if more than 25 results, allows sorting through pages
+    let res = await fetch(`https://api.bounties.network/bounty/?ordering=usd_price&issuer=0x4be5f7c9912afd58bcda39b0a4ec76e7b21ba0f1&bountyStage=1&offset=${page}`)
     let json = await res.json();
+    console.log(json);
+    setTotalResults(json.count)
     setBounties(json.results);
   }
 
+  const nextPage = () => {
+    setPage(page+25);
+  }
+
+  const prevPage = () => {
+    setPage(page-25);
+  }
+
   const createCard = () => {
-    return bounties.map((bounty) => (
-      
-        <div>
+    return bounties.map((bounty) =>  (
+      <div key={bounty.id}>
         <h2><a href={bounty.attached_url}>{bounty.title} [{parseFloat(bounty.calculated_fulfillment_amount).toFixed(2)} {bounty.token_symbol}]</a></h2>
-          <p>
-            {bounty.description}
-          </p>
-        </div>
-      
+        <p>
+          {bounty.description}
+        </p>
+      </div>
     ))
   }
 
   useEffect(() => {
     getApi();
-  },[])
+  },[page])
 
   console.log(bounties)
+  console.log(totalResults);
 
   return (
     <div className="App">
@@ -53,6 +64,14 @@ function App() {
         {
           createCard()
         }
+        <tr>
+        {
+          page - 25 > 0 && (<a href='#' onClick={prevPage}>prev</a>)
+        }
+        {
+          page + 25 < totalResults && (<a href='#' onClick={nextPage}>next</a>)
+        }
+        </tr>
       </header>
     </div>
   );
